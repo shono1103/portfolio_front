@@ -1,29 +1,10 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import TagCloud from 'TagCloud'
 
-const skills = [
-	'Python',
-	'Typescript',
-	'C++',
-	'Shell',
-	'React',
-	'NodeJS',
-	'FastAPI',
-	'Redis',
-	'Docker',
-	'Kubernetes',
-	'Git',
-	'Linux',
-	'HTML5',
-	'CSS3',
-	'JavaScript',
-	'C',
-	'GDB',
-	'WSL2',
-	'Ruby',
-	'Rails'
-]
+import { skillsApi } from '../../common/apiClient'
+
+const DEFAULT_SKILLS = []
 
 const options = {
 	radius: 300,
@@ -42,10 +23,39 @@ const options = {
 const WordCloud = () => {
 	const containerRef = useRef(null)
 	const tagCloudInstance = useRef(null)
+	const [skills, setSkills] = useState([])
 
 	useEffect(() => {
-		if (!containerRef.current || tagCloudInstance.current) {
+		let isMounted = true
+
+		const fetchSkills = async () => {
+			try {
+				const apiSkills = await skillsApi.list()
+				if (isMounted) {
+					setSkills(Array.isArray(apiSkills) ? apiSkills : DEFAULT_SKILLS)
+				}
+			} catch (error) {
+				console.error('Failed to load skills from API', error)
+				if (isMounted) {
+					setSkills(DEFAULT_SKILLS)
+				}
+			}
+		}
+
+		fetchSkills()
+
+		return () => {
+			isMounted = false
+		}
+	}, [])
+
+	useEffect(() => {
+		if (!containerRef.current || skills.length === 0) {
 			return
+		}
+
+		if (tagCloudInstance.current?.destroy) {
+			tagCloudInstance.current.destroy()
 		}
 
 		tagCloudInstance.current = TagCloud(containerRef.current, skills, options)
@@ -56,7 +66,7 @@ const WordCloud = () => {
 				tagCloudInstance.current = null
 			}
 		}
-	}, [])
+	}, [skills])
 
 	return (
 		<div className="main">
