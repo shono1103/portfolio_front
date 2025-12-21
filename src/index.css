@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
+
 html {
   font-size: 62.5%;
 }
@@ -5,7 +7,8 @@ html {
 body {
   margin: 0;
   font:
-    300 11px/1.4 'Helvetica Neue',
+    300 11px/1.4 'Noto Sans JP',
+    'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
